@@ -1,0 +1,153 @@
+$cardsColors: #ed5565, #fc6e51, #ffce54, #2ecc71, #5d9cec, #ac92ec;
+
+@mixin transition($ease: false) {
+    @if $ease == false {
+        transition: 0.5s cubic-bezier(0.05, 0.61, 0.41, 0.95);
+    } @else {
+        transition:
+            0.5s cubic-bezier(0.05, 0.61, 0.41, 0.95),
+            opacity 0.5s ease-out;
+    }
+}
+
+@mixin shadow {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 12rem;
+    @include transition;
+}
+
+.expanding-cards {
+    display: flex;
+    flex-direction: row;
+    // align-items: stretch;
+    overflow-x: scroll;
+
+    // good practice to avoid min-max width
+    width: max(60rem, calc(100% - 100px));
+    height: 40rem;
+
+    @for $i from 1 through 4 {
+        @media screen and (max-width: (798px - $i*80)) {
+            min-width: 600px - $i * 80;
+            .option:nth-child(#{6-$i}) {
+                display: none;
+            }
+        }
+    }
+
+    &__option {
+        position: relative;
+        overflow: hidden;
+
+        min-width: 8rem;
+        margin: 1rem;
+        background: var(--optionBg, var(--defaultBg, #e6e9ed));
+        background-size: auto 120%;
+        background-position: center;
+        cursor: pointer;
+
+        @include transition;
+
+        @for $i from 1 through length($cardsColors) {
+            &:nth-child(#{$i}) {
+                --defaultBg: #{nth($cardsColors, $i)};
+            }
+        }
+        &--active {
+            flex-grow: 10000;
+            transform: scale(1);
+
+            min-width: 30rem;
+            margin: 0px;
+            border-radius: 4rem;
+
+            background-size: auto 100%;
+        }
+        &--active > &__shadow {
+            box-shadow:
+                inset 0 -120px 120px -120px black,
+                inset 0 -120px 120px -100px black;
+        }
+        &--active > &__label {
+            bottom: 2rem;
+            left: 2rem;
+        }
+        &--active > &__info {
+            & > div {
+                left: 0;
+                opacity: 1;
+            }
+        }
+
+        &:not(&--active) {
+            flex-grow: 1;
+            border-radius: 3rem;
+        }
+        &:not(&--active) > &__shadow {
+            bottom: -4rem;
+            box-shadow:
+                inset 0 -120px 0px -120px black,
+                inset 0 -120px 0px -100px black;
+        }
+        &:not(&--active) > &__label {
+            bottom: 1rem;
+            left: 1rem;
+            & > .expanding-cards__option__info {
+                display: none;
+            }
+        }
+
+        &__shadow {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 12rem;
+            @include transition;
+        }
+        &__label {
+            display: flex;
+            position: absolute;
+            right: 0;
+            height: 4rem;
+            @include transition;
+        }
+        &__icon {
+            display: flex;
+            flex-direction: row;
+            justify-content: center;
+            align-items: center;
+            width: 4rem;
+            height: 4rem;
+            border-radius: 100%;
+
+            color: var(--defaultBg);
+            background-color: white;
+        }
+        &__info {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+
+            margin-left: 10px;
+
+            color: white;
+
+            white-space: pre;
+            & > div {
+                @include transition(true);
+                position: relative;
+            }
+        }
+        &__title {
+            font-weight: bold;
+            font-size: 2rem;
+        }
+        &__desc {
+            transition-delay: 0.1s;
+        }
+    }
+}
